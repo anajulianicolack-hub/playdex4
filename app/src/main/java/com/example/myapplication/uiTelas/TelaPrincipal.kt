@@ -1,9 +1,5 @@
-package com.example.myapplication
+package com.example.myapplication.uiTelas
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -30,7 +26,6 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -46,10 +41,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.MainScreen
+import com.example.myapplication.R
+import com.example.myapplication.RotasAbas
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
 data class GameItem(val title: String, val imageResId: Int)
@@ -70,7 +65,7 @@ fun TelaHome(onNavigateToSettings: () -> Unit) {
         Spacer(modifier = Modifier.height(20.dp))
 
         titulosJogos(title = "Popular")
-        listaJogos(
+        ListaJogos(
             games = listOf(
                 GameItem("Resident Evil", R.drawable.residentevil9),
                 GameItem("Baldur's Gate 3", R.drawable.galdursgate3),
@@ -81,7 +76,7 @@ fun TelaHome(onNavigateToSettings: () -> Unit) {
         Spacer(modifier = Modifier.height(20.dp))
 
         titulosJogos(title = "Para Você")
-        listaJogos(
+        ListaJogos(
             games = listOf(
                 GameItem("Stardew Valley", R.drawable.stardewvalley),
                 GameItem("Portal", R.drawable.portal),
@@ -283,7 +278,7 @@ fun titulosJogos(title: String) {
 }
 
 @Composable
-fun listaJogos(games: List<GameItem>) {
+fun ListaJogos(games: List<GameItem>) {
     LazyRow(
         contentPadding = PaddingValues(horizontal = 20.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)

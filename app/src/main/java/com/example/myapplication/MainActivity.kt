@@ -10,12 +10,18 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import com.example.myapplication.uiTelas.BottomNavBar
+import com.example.myapplication.uiTelas.TelaConfiguracoes
+import com.example.myapplication.uiTelas.TelaDadosJogo
+import com.example.myapplication.uiTelas.TelaFavoritos
+import com.example.myapplication.uiTelas.TelaHome
+import com.example.myapplication.uiTelas.TelaPerfilUsuario
+import com.example.myapplication.uiTelas.TelaPesquisa
+import com.example.myapplication.uiTelas.TelaReview
 
 class MainActivity : ComponentActivity() {
 

@@ -1,7 +1,6 @@
-package com.example.myapplication
+package com.example.myapplication.uiTelas
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -22,6 +21,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.viewModel.FavoritosViewModel
+import com.example.myapplication.dataLocal.ItemFavorito
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
 

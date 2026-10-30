@@ -1,18 +1,24 @@
-package com.example.myapplication
+package com.example.myapplication.viewModel
 
 import android.app.Application
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.myapplication.atualizarFavorito
+import com.example.myapplication.buscarFavoritos
+import com.example.myapplication.dataLocal.AppDatabase
+import com.example.myapplication.dataLocal.ItemFavorito
+import com.example.myapplication.deletarFavorito
+import com.example.myapplication.inserirFavorito
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class FavoritosViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val db = AppDatabase.getDatabase(application)
+    private val db = AppDatabase.Companion.getDatabase(application)
     private val favoritoDao = db.favoritoDao()
 
     var favoritos by mutableStateOf<List<ItemFavorito>>(emptyList())
@@ -66,7 +72,13 @@ class FavoritosViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun adicionar(nome: String, status: String, data: String, nota: Int, review: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val novoItem = ItemFavorito(title = nome, status = status, review = review, nota = nota, data = data)
+            val novoItem = ItemFavorito(
+                title = nome,
+                status = status,
+                review = review,
+                nota = nota,
+                data = data
+            )
             inserirFavorito(novoItem, favoritoDao)
             val listaAtualizada = buscarFavoritos(favoritoDao)
             withContext(Dispatchers.Main) {

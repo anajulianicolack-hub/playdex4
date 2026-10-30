@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.myapplication.viewModel
 
 import android.app.Application
 import androidx.compose.runtime.getValue
@@ -7,13 +7,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.myapplication.dataLocal.AppDatabase
+import com.example.myapplication.dataLocal.ItemPesquisa
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class PesquisaViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val pesquisaDao = AppDatabase.getDatabase(application).pesquisaDao()
+    private val pesquisaDao = AppDatabase.Companion.getDatabase(application).pesquisaDao()
 
     var textoPesquisa by mutableStateOf("")
         private set

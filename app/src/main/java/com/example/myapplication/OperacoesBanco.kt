@@ -1,6 +1,10 @@
 package com.example.myapplication
 
 import android.util.Log
+import com.example.myapplication.dataLocal.FavoritoDao
+import com.example.myapplication.dataLocal.ItemFavorito
+import com.example.myapplication.dataLocal.ItemPesquisa
+import com.example.myapplication.dataLocal.PesquisaDAO
 
 suspend fun inserirPesquisa(nome: String, pesquisaDao: PesquisaDAO) {
     try {

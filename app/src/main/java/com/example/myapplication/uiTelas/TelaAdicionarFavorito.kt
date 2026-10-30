@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.myapplication.uiTelas
 
 import android.app.DatePickerDialog
 import android.widget.Toast
@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.myapplication.dataLocal.ItemFavorito
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import java.util.Calendar
 
