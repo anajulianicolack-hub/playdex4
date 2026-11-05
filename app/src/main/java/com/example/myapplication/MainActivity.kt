@@ -13,15 +13,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.navigation.RotasAbas
 import com.example.myapplication.ui.theme.MyApplicationTheme
-import com.example.myapplication.uiTelas.BottomNavBar
-import com.example.myapplication.uiTelas.TelaConfiguracoes
-import com.example.myapplication.uiTelas.TelaDadosJogo
-import com.example.myapplication.uiTelas.TelaFavoritos
-import com.example.myapplication.uiTelas.TelaHome
-import com.example.myapplication.uiTelas.TelaPerfilUsuario
-import com.example.myapplication.uiTelas.TelaPesquisa
-import com.example.myapplication.uiTelas.TelaReview
+import com.example.myapplication.ui.telas.BottomNavBar
+import com.example.myapplication.ui.telas.TelaConfiguracoes
+import com.example.myapplication.ui.telas.TelaDadosJogo
+import com.example.myapplication.ui.telas.TelaFavoritos
+import com.example.myapplication.ui.telas.TelaHome
+import com.example.myapplication.ui.telas.TelaPerfilUsuario
+import com.example.myapplication.ui.telas.TelaPesquisa
+import com.example.myapplication.ui.telas.TelaReview
 
 class MainActivity : ComponentActivity() {
 

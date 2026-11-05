@@ -1,4 +1,4 @@
-package com.example.myapplication.uiTelas
+package com.example.myapplication.ui.telas
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.R
-import com.example.myapplication.RotasAbas
+import com.example.myapplication.navigation.RotasAbas
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
 data class ProfileGameItem(

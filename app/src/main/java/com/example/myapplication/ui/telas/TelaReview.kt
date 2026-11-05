@@ -1,4 +1,4 @@
-package com.example.myapplication.uiTelas
+package com.example.myapplication.ui.telas
 
 import android.app.DatePickerDialog
 import android.widget.Toast

@@ -1,4 +1,4 @@
-package com.example.myapplication.uiTelas
+package com.example.myapplication.ui.telas
 
 import android.app.DatePickerDialog
 import android.widget.Toast
@@ -24,7 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myapplication.dataLocal.ItemFavorito
+import com.example.myapplication.data.local.entity.ItemFavorito
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import java.util.Calendar
 
@@ -67,6 +67,7 @@ fun TelaAdicionarFavorito(
             .background(fundo)
             .verticalScroll(rememberScrollState())
     ) {
+        // Cabeçalho
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -97,14 +98,18 @@ fun TelaAdicionarFavorito(
             modifier = Modifier.padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            // Busca por ID
             Text("Buscar por ID", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
-
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 OutlinedTextField(
                     value = idBusca,
                     onValueChange = { idBusca = it },
-                    placeholder = { Text("Ex: 1") },
+                    placeholder = { Text("Ex: 1", color = Color.Gray) },
                     singleLine = true,
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(16.dp),
@@ -120,7 +125,11 @@ fun TelaAdicionarFavorito(
                 Button(
                     onClick = {
                         val id = idBusca.toIntOrNull()
-                        if (id != null) onBuscarId(id) else Toast.makeText(context, "Digite um ID válido", Toast.LENGTH_SHORT).show()
+                        if (id != null) {
+                            onBuscarId(id)
+                        } else {
+                            Toast.makeText(context, "Digite um ID válido", Toast.LENGTH_SHORT).show()
+                        }
                     },
                     modifier = Modifier.height(56.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = roxo),
@@ -130,34 +139,48 @@ fun TelaAdicionarFavorito(
                 }
             }
 
-
+            // Exibição do resultado da busca
             if (resultadoBusca != null) {
                 Surface(
                     color = Color(0xFF2A1C4E),
                     shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp)
+                        .clickable {
+                            // Preenche os campos do formulário ao clicar no item encontrado
+                            nome = resultadoBusca.title
+                            status = resultadoBusca.status
+                            data = resultadoBusca.data
+                            nota = resultadoBusca.nota
+                            review = resultadoBusca.review
+                        }
                 ) {
-                    Text(
-                        text = "Encontrado: ${resultadoBusca.title} (Status: ${resultadoBusca.status})",
-                        color = Color.White,
-                        modifier = Modifier.padding(12.dp)
-                    )
+                    Column(modifier = Modifier.padding(12.dp)) {
+                        Text(
+                            text = "Encontrado: ${resultadoBusca.title}",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp
+                        )
+                        Text(
+                            text = "Status: ${resultadoBusca.status} | Clique para preencher o formulário",
+                            color = Color(0xFFA855F7),
+                            fontSize = 12.sp
+                        )
+                    }
                 }
             }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(8.dp))
 
-            Text(
-                "Nome do jogo",
-                color = Color.White,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
+            // Campo Nome do jogo
+            Text("Nome do jogo", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
             OutlinedTextField(
                 value = nome,
                 onValueChange = { nome = it },
-                placeholder = { Text("Ex: Minecraft") },
+                placeholder = { Text("Ex: Minecraft", color = Color.Gray) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
@@ -172,99 +195,68 @@ fun TelaAdicionarFavorito(
 
             Spacer(Modifier.height(6.dp))
 
-            Text(
-                "Status",
-                color = Color.White,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
+            // Campo Status
+            Text("Status", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 listOf("Joguei", "Quero jogar", "Gostei").forEach { opcao ->
                     Button(
                         onClick = { status = opcao },
                         modifier = Modifier.weight(1f),
-                        contentPadding = PaddingValues(
-                            horizontal = 4.dp,
-                            vertical = 6.dp
-                        ),
+                        contentPadding = PaddingValues(horizontal = 4.dp, vertical = 6.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (status == opcao) {
-                                roxo
-                            } else {
-                                Color(0xFF2A1C4E)
-                            }
+                            containerColor = if (status == opcao) roxo else Color(0xFF2A1C4E)
                         ),
                         shape = RoundedCornerShape(14.dp)
                     ) {
-                        Text(
-                            opcao,
-                            fontSize = 11.sp,
-                            maxLines = 1
-                        )
+                        Text(opcao, fontSize = 11.sp, maxLines = 1)
                     }
                 }
             }
 
             Spacer(Modifier.height(6.dp))
 
-            Text(
-                "Data",
-                color = Color.White,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
+            // Campo Data
+            Text("Data", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
-            OutlinedTextField(
-                value = data,
-                onValueChange = {},
-                readOnly = true,
-                placeholder = { Text("Selecionar data") },
-                trailingIcon = {
-                    IconButton(onClick = abrirCalendario) {
-                        Icon(
-                            Icons.Default.DateRange,
-                            contentDescription = "Selecionar data",
-                            tint = Color.White
-                        )
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable(onClick = abrirCalendario),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = campo,
-                    unfocusedContainerColor = campo,
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White
+            Box(modifier = Modifier.fillMaxWidth().clickable(onClick = abrirCalendario)) {
+                OutlinedTextField(
+                    value = data,
+                    onValueChange = {},
+                    readOnly = true,
+                    enabled = false, // Desabilita digitação manual para forçar o clique do calendário
+                    placeholder = { Text("Selecionar data", color = Color.Gray) },
+                    trailingIcon = {
+                        IconButton(onClick = abrirCalendario) {
+                            Icon(
+                                Icons.Default.DateRange,
+                                contentDescription = "Selecionar data",
+                                tint = Color.White
+                            )
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        disabledContainerColor = campo,
+                        disabledTextColor = Color.White,
+                        disabledBorderColor = Color.Transparent,
+                        disabledPlaceholderColor = Color.Gray
+                    )
                 )
-            )
+            }
 
             Spacer(Modifier.height(6.dp))
 
-            Text(
-                "Sua Nota",
-                color = Color.White,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
+            // Campo Nota em Estrelas
+            Text("Sua Nota", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 for (estrela in 1..5) {
                     Icon(
-                        imageVector = if (estrela <= nota) {
-                            Icons.Filled.Star
-                        } else {
-                            Icons.Outlined.Star
-                        },
+                        imageVector = if (estrela <= nota) Icons.Filled.Star else Icons.Outlined.Star,
                         contentDescription = "Nota $estrela",
-                        tint = if (estrela <= nota) {
-                            Color(0xFFFFD700)
-                        } else {
-                            Color.LightGray
-                        },
+                        tint = if (estrela <= nota) Color(0xFFFFD700) else Color.LightGray,
                         modifier = Modifier
                             .size(34.dp)
                             .clickable { nota = estrela }
@@ -274,17 +266,13 @@ fun TelaAdicionarFavorito(
 
             Spacer(Modifier.height(6.dp))
 
-            Text(
-                "Review (opcional)",
-                color = Color.White,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
+            // Campo Review
+            Text("Review (opcional)", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
             OutlinedTextField(
                 value = review,
                 onValueChange = { review = it },
-                placeholder = { Text("Escreva sua review...") },
+                placeholder = { Text("Escreva sua review...", color = Color.Gray) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(140.dp),
@@ -300,6 +288,7 @@ fun TelaAdicionarFavorito(
 
             Spacer(Modifier.height(12.dp))
 
+            // Botão Adicionar
             Button(
                 onClick = {
                     when {
@@ -327,22 +316,12 @@ fun TelaAdicionarFavorito(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = roxo
-                ),
+                colors = ButtonDefaults.buttonColors(containerColor = roxo),
                 shape = RoundedCornerShape(24.dp)
             ) {
-                Icon(
-                    Icons.Default.Favorite,
-                    contentDescription = null
-                )
-
+                Icon(Icons.Default.Favorite, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
-
-                Text(
-                    "Adicionar aos Favoritos",
-                    fontWeight = FontWeight.Bold
-                )
+                Text("Adicionar aos Favoritos", fontWeight = FontWeight.Bold)
             }
         }
     }

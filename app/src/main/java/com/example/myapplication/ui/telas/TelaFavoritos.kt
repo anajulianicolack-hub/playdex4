@@ -1,4 +1,4 @@
-package com.example.myapplication.uiTelas
+package com.example.myapplication.ui.telas
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -15,33 +15,44 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.myapplication.data.local.AppDatabase
+import com.example.myapplication.data.local.entity.ItemFavorito
+import com.example.myapplication.data.repository.ItemFavoritoRepository
 import com.example.myapplication.viewModel.FavoritosViewModel
-import com.example.myapplication.dataLocal.ItemFavorito
-import com.example.myapplication.ui.theme.MyApplicationTheme
-
+import com.example.myapplication.viewModel.FavoritosViewModelFactory
 
 @Composable
 fun TelaFavoritos(
     onBackClick: () -> Unit = {},
-    viewModel: FavoritosViewModel = viewModel()
+    viewModel: FavoritosViewModel = viewModel(
+        factory = FavoritosViewModelFactory(
+            ItemFavoritoRepository(
+                AppDatabase.getDatabase(LocalContext.current).favoritoDao()
+            )
+        )
+    )
 ) {
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     val fundo = Color(0xFF13082B)
     val roxoHeader = Color(0xFF240047)
     val roxo = Color(0xFF8B2FC9)
 
-    val favoritos = viewModel.favoritos
-    val filtroSelecionado = viewModel.filtroSelecionado
-    val adicionandoFavorito = viewModel.adicionandoFavorito
-    val favoritoSelecionado = viewModel.favoritoSelecionado
+    val favoritos = uiState.listaFavoritos
+    val filtroSelecionado = uiState.filtroSelecionado
+    val adicionandoFavorito = uiState.adicionandoFavorito
+    val favoritoSelecionado = uiState.favoritoSelecionado
 
     if (favoritoSelecionado != null) {
-        val itemAtual = favoritoSelecionado!!
+        val itemAtual = favoritoSelecionado
 
         TelaDetalhesFavorito(
             nomeJogo = itemAtual.title,
@@ -49,7 +60,7 @@ fun TelaFavoritos(
             nota = itemAtual.nota,
             data = itemAtual.data,
             review = itemAtual.review,
-            onBackClick = { viewModel.selecionarFavoritoPorId(null) }, // Alterado para a nova função
+            onBackClick = { viewModel.selecionarFavoritoPorId(null) },
             onSalvar = { novoNome, novoStatus, novaNota, novaData, novaReview ->
                 viewModel.atualizar(itemAtual, novoNome, novoStatus, novaNota, novaData, novaReview)
             }
@@ -64,7 +75,7 @@ fun TelaFavoritos(
                 viewModel.adicionar(nome, status, data, nota, review)
             },
             onBuscarId = { id -> viewModel.buscarFavoritoPorId(id) },
-            resultadoBusca = viewModel.resultadoBuscaId
+            resultadoBusca = uiState.resultadoBuscaId
         )
         return
     }
@@ -72,13 +83,15 @@ fun TelaFavoritos(
     val filtros = listOf("Todos", "Joguei", "Quero jogar", "Gostei")
 
     val listaFiltrada = if (filtroSelecionado == "Todos") {
-        favoritos.toList()
+        favoritos
     } else {
         favoritos.filter { it.status.equals(filtroSelecionado, ignoreCase = true) }
     }
 
     Column(
-        modifier = Modifier.fillMaxSize().background(fundo)
+        modifier = Modifier
+            .fillMaxSize()
+            .background(fundo)
     ) {
         Box(
             modifier = Modifier
@@ -105,7 +118,10 @@ fun TelaFavoritos(
 
         Button(
             onClick = { viewModel.abrirAdicionar() },
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp).height(48.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+                .height(48.dp),
             colors = ButtonDefaults.buttonColors(containerColor = roxo),
             shape = RoundedCornerShape(20.dp)
         ) {
@@ -143,7 +159,10 @@ fun TelaFavoritos(
             contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            items(listaFiltrada, key = { it.id }) { item ->
+            items(
+                items = listaFiltrada,
+                key = { item -> item.id }
+            ) { item ->
                 CardFavoritoItem(
                     item = item,
                     onClick = { viewModel.selecionarFavoritoPorId(item.id) },
@@ -169,7 +188,9 @@ fun CardFavoritoItem(
         )
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(
@@ -209,13 +230,5 @@ fun CardFavoritoItem(
                 )
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun TelaFavoritosPreview() {
-    MyApplicationTheme {
-        TelaFavoritos()
     }
 }

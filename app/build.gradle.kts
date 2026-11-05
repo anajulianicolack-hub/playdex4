@@ -78,7 +78,19 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 
     val room_version = "3.0.3"
+    val lifecycle_version = "2.8.7"
 
     implementation("androidx.room3:room3-runtime:$room_version")
     ksp("androidx.room3:room3-compiler:$room_version")
+
+    // ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:${lifecycle_version}")
+
+    // Integração do ViewModel com Jetpack Compose
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:${lifecycle_version}")
+
+    // Coleta seguro de StateFlow no ciclo de vida do Compose
+    // (necessário para o collectAsStateWithLifecycle)
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:${lifecycle_version}")
+
 }

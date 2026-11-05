@@ -1,4 +1,4 @@
-package com.example.myapplication.uiTelas
+package com.example.myapplication.ui.telas
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,30 +24,38 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myapplication.dataLocal.ItemPesquisa
+import com.example.myapplication.data.local.AppDatabase
+import com.example.myapplication.data.local.entity.ItemPesquisa
+import com.example.myapplication.data.repository.ItemPesquisaRepository
 import com.example.myapplication.viewModel.PesquisaViewModel
-
-data class PesquisaItem(
-    val id: Int,
-    val nome: String
-)
+import com.example.myapplication.viewModel.PesquisaViewModelFactory
 
 @Composable
 fun TelaPesquisa(
-    viewModel: PesquisaViewModel = viewModel(),
+    viewModel: PesquisaViewModel = viewModel(
+        factory = PesquisaViewModelFactory(
+            ItemPesquisaRepository(
+                AppDatabase.getDatabase(LocalContext.current).pesquisaDao()
+            )
+        )
+    ),
     onJogoClick: (String) -> Unit = {},
     onBackClick: () -> Unit = {}
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -99,7 +107,7 @@ fun TelaPesquisa(
                 )
 
                 BasicTextField(
-                    value = viewModel.textoPesquisa,
+                    value = uiState.textoPesquisa,
                     onValueChange = {
                         viewModel.atualizarTexto(it)
                     },
@@ -110,7 +118,7 @@ fun TelaPesquisa(
                     ),
                     modifier = Modifier.fillMaxWidth(),
                     decorationBox = { campoTexto ->
-                        if (viewModel.textoPesquisa.isEmpty()) {
+                        if (uiState.textoPesquisa.isEmpty()) {
                             Text(
                                 text = "Pesquisar...",
                                 color = Color(0xFFB8B0C4),
@@ -145,7 +153,7 @@ fun TelaPesquisa(
             modifier = Modifier.fillMaxSize()
         ) {
             items(
-                items = viewModel.historico,
+                items = uiState.historico,
                 key = { jogo -> jogo.id }
             ) { jogo ->
                 ItemHistorico(
@@ -223,10 +231,4 @@ fun ItemHistorico(
             )
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewTelaPesquisa() {
-    TelaPesquisa()
 }

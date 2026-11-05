@@ -1,4 +1,4 @@
-package com.example.myapplication.uiTelas
+package com.example.myapplication.ui.telas
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

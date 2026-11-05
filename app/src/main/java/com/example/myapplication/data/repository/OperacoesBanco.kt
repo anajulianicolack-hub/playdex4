@@ -1,10 +1,7 @@
-package com.example.myapplication
+package com.example.myapplication.data.repository
 
-import android.util.Log
-import com.example.myapplication.dataLocal.FavoritoDao
-import com.example.myapplication.dataLocal.ItemFavorito
-import com.example.myapplication.dataLocal.ItemPesquisa
-import com.example.myapplication.dataLocal.PesquisaDAO
+/*
+>>> COLOCANDO TODAS ESSAS FUNÇÕES NO REPOSITORY <<<
 
 suspend fun inserirPesquisa(nome: String, pesquisaDao: PesquisaDAO) {
     try {
@@ -30,7 +27,9 @@ suspend fun deletarPesquisa(item: ItemPesquisa, pesquisaDao: PesquisaDAO) {
         Log.e("Erro ao deletar", "Msg: ${e.message}")
     }
 }
+*/
 
+/*
 suspend fun inserirFavorito(item: ItemFavorito, favoritoDao: FavoritoDao) {
     try {
         favoritoDao.inserir(item)
@@ -63,3 +62,5 @@ suspend fun deletarFavorito(item: ItemFavorito, favoritoDao: FavoritoDao) {
         Log.e("Erro ao deletar favorito", "Msg: ${e.message}")
     }
 }
+
+*/

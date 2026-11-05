@@ -1,135 +1,120 @@
 package com.example.myapplication.viewModel
 
-import android.app.Application
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.myapplication.atualizarFavorito
-import com.example.myapplication.buscarFavoritos
-import com.example.myapplication.dataLocal.AppDatabase
-import com.example.myapplication.dataLocal.ItemFavorito
-import com.example.myapplication.deletarFavorito
-import com.example.myapplication.inserirFavorito
-import kotlinx.coroutines.Dispatchers
+import com.example.myapplication.data.local.entity.ItemFavorito
+import com.example.myapplication.data.repository.ItemFavoritoRepository
+import com.example.myapplication.ui.state.FavoritosUIState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
-class FavoritosViewModel(application: Application) : AndroidViewModel(application) {
+class FavoritosViewModel(private val repository: ItemFavoritoRepository) : ViewModel() {
 
-    private val db = AppDatabase.Companion.getDatabase(application)
-    private val favoritoDao = db.favoritoDao()
-
-    var favoritos by mutableStateOf<List<ItemFavorito>>(emptyList())
-        private set
-
-    var filtroSelecionado by mutableStateOf("Todos")
-        private set
-    var adicionandoFavorito by mutableStateOf(false)
-        private set
-    var favoritoSelecionado by mutableStateOf<ItemFavorito?>(null)
-        private set
+    private val _uiState = MutableStateFlow(FavoritosUIState())
+    val uiState: StateFlow<FavoritosUIState> = _uiState.asStateFlow()
 
     init {
-        carregarFavoritos()
-    }
-
-    private fun carregarFavoritos() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val lista = buscarFavoritos(favoritoDao)
-            withContext(Dispatchers.Main) {
-                favoritos = lista
+        // Coleta o Flow reativo continuamente do Room
+        viewModelScope.launch {
+            repository.buscarTodosFavoritos().collect { lista ->
+                _uiState.update { it.copy(listaFavoritos = lista) }
             }
         }
     }
 
     fun setFiltro(filtro: String) {
-        filtroSelecionado = filtro
+        _uiState.update { it.copy(filtroSelecionado = filtro) }
     }
 
     fun abrirAdicionar() {
-        adicionandoFavorito = true
+        _uiState.update { it.copy(adicionandoFavorito = true) }
     }
 
     fun fecharAdicionar() {
-        adicionandoFavorito = false
+        _uiState.update { it.copy(adicionandoFavorito = false) }
     }
 
     fun selecionarFavoritoPorId(id: Int?) {
         if (id == null) {
-            favoritoSelecionado = null
+            _uiState.update { it.copy(favoritoSelecionado = null) }
             return
         }
 
-        viewModelScope.launch(Dispatchers.IO) {
-            val itemDoBanco = favoritoDao.buscarPorId(id)
-            withContext(Dispatchers.Main) {
-                favoritoSelecionado = itemDoBanco
-            }
+        viewModelScope.launch {
+            val itemDoBanco = repository.buscarPorId(id)
+            _uiState.update { it.copy(favoritoSelecionado = itemDoBanco) }
         }
     }
 
     fun adicionar(nome: String, status: String, data: String, nota: Int, review: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val novoItem = ItemFavorito(
-                title = nome,
-                status = status,
-                review = review,
-                nota = nota,
-                data = data
-            )
-            inserirFavorito(novoItem, favoritoDao)
-            val listaAtualizada = buscarFavoritos(favoritoDao)
-            withContext(Dispatchers.Main) {
-                favoritos = listaAtualizada
-                filtroSelecionado = "Todos"
-                fecharAdicionar()
+        val novoItem = ItemFavorito(
+            title = nome,
+            status = status,
+            review = review,
+            nota = nota,
+            data = data
+        )
+
+        viewModelScope.launch {
+            repository.inserirFavorito(novoItem)
+            _uiState.update {
+                it.copy(
+                    filtroSelecionado = "Todos",
+                    adicionandoFavorito = false
+                )
             }
         }
     }
 
     fun atualizar(itemAtual: ItemFavorito, novoNome: String, novoStatus: String, novaNota: Int, novaData: String, novaReview: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val itemAtualizado = itemAtual.copy(
-                title = novoNome,
-                status = novoStatus,
-                nota = novaNota,
-                data = novaData,
-                review = novaReview
-            )
-            atualizarFavorito(itemAtualizado, favoritoDao)
-            val listaAtualizada = buscarFavoritos(favoritoDao)
-            withContext(Dispatchers.Main) {
-                favoritos = listaAtualizada
-                favoritoSelecionado = itemAtualizado
-            }
+        val itemAtualizado = itemAtual.copy(
+            title = novoNome,
+            status = novoStatus,
+            nota = novaNota,
+            data = novaData,
+            review = novaReview
+        )
+
+        viewModelScope.launch {
+            repository.atualizarFavorito(itemAtualizado)
+            _uiState.update { it.copy(favoritoSelecionado = itemAtualizado) }
         }
     }
 
     fun remover(item: ItemFavorito) {
-        viewModelScope.launch(Dispatchers.IO) {
-            deletarFavorito(item, favoritoDao)
-            val listaAtualizada = buscarFavoritos(favoritoDao)
-            withContext(Dispatchers.Main) {
-                favoritos = listaAtualizada
-                if (favoritoSelecionado?.id == item.id) {
-                    favoritoSelecionado = null
+        viewModelScope.launch {
+            repository.deletarFavorito(item)
+            _uiState.update {
+                if (it.favoritoSelecionado?.id == item.id) {
+                    it.copy(favoritoSelecionado = null)
+                } else {
+                    it
                 }
             }
         }
     }
 
-    var resultadoBuscaId by mutableStateOf<ItemFavorito?>(null)
-        private set
-
     fun buscarFavoritoPorId(id: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val resultado = favoritoDao.buscarPorId(id)
-            withContext(Dispatchers.Main) {
-                resultadoBuscaId = resultado
-            }
+        viewModelScope.launch {
+            val resultado = repository.buscarPorId(id)
+            _uiState.update { it.copy(resultadoBuscaId = resultado) }
         }
     }
+}
 
+// Fábrica necessária para instanciar o ViewModel com o Repository
+class FavoritosViewModelFactory(
+    private val repository: ItemFavoritoRepository
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(FavoritosViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return FavoritosViewModel(repository) as T
+        }
+        throw IllegalArgumentException("Classe ViewModel desconhecida")
+    }
 }

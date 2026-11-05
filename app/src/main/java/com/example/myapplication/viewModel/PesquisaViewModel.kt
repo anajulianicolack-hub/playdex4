@@ -1,70 +1,63 @@
 package com.example.myapplication.viewModel
 
-import android.app.Application
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.myapplication.dataLocal.AppDatabase
-import com.example.myapplication.dataLocal.ItemPesquisa
-import kotlinx.coroutines.Dispatchers
+import com.example.myapplication.data.local.entity.ItemPesquisa
+import com.example.myapplication.data.repository.ItemPesquisaRepository
+import com.example.myapplication.ui.state.PesquisaUiState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
-class PesquisaViewModel(application: Application) : AndroidViewModel(application) {
+class PesquisaViewModel(
+    private val repository: ItemPesquisaRepository
+) : ViewModel() {
 
-    private val pesquisaDao = AppDatabase.Companion.getDatabase(application).pesquisaDao()
-
-    var textoPesquisa by mutableStateOf("")
-        private set
-
-    val historico = mutableStateListOf<ItemPesquisa>()
+    private val _uiState = MutableStateFlow(PesquisaUiState())
+    val uiState: StateFlow<PesquisaUiState> = _uiState.asStateFlow()
 
     init {
-        carregarHistorico()
-    }
-
-    private fun carregarHistorico() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val itensDoBanco = pesquisaDao.buscarItens()
-            withContext(Dispatchers.Main) {
-                historico.clear()
-                historico.addAll(itensDoBanco)
+        // Coleta o Flow reativo em tempo real do banco de dados
+        viewModelScope.launch {
+            repository.buscarPesquisas().collect { lista ->
+                _uiState.update { it.copy(historico = lista) }
             }
         }
     }
 
     fun atualizarTexto(novoTexto: String) {
-        textoPesquisa = novoTexto
+        _uiState.update { it.copy(textoPesquisa = novoTexto) }
     }
 
     fun adicionarPesquisa() {
-        val pesquisaTrim = textoPesquisa.trim()
+        val pesquisaTrim = _uiState.value.textoPesquisa.trim()
         if (pesquisaTrim.isNotEmpty()) {
-            viewModelScope.launch(Dispatchers.IO) {
-                pesquisaDao.inserir(ItemPesquisa(id = 0, nome = pesquisaTrim))
-
-                val itensAtualizados = pesquisaDao.buscarItens()
-                withContext(Dispatchers.Main) {
-                    historico.clear()
-                    historico.addAll(itensAtualizados)
-                    textoPesquisa = ""
-                }
+            viewModelScope.launch {
+                repository.inserirPesquisa(pesquisaTrim)
+                _uiState.update { it.copy(textoPesquisa = "") }
             }
         }
     }
 
     fun removerItem(item: ItemPesquisa) {
-        viewModelScope.launch(Dispatchers.IO) {
-            pesquisaDao.removerItem(item)
-
-            val itensAtualizados = pesquisaDao.buscarItens()
-            withContext(Dispatchers.Main) {
-                historico.clear()
-                historico.addAll(itensAtualizados)
-            }
+        viewModelScope.launch {
+            repository.deletarPesquisa(item)
         }
+    }
+}
+
+// Fábrica necessária para criar a ViewModel com a dependência do Repository
+class PesquisaViewModelFactory(
+    private val repository: ItemPesquisaRepository
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(PesquisaViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return PesquisaViewModel(repository) as T
+        }
+        throw IllegalArgumentException("Classe ViewModel desconhecida")
     }
 }

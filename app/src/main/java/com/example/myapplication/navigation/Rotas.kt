@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.myapplication.navigation
 
 object RotasAbas {
     const val ABA_HOME = "home"
