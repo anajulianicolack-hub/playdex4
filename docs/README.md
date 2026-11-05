@@ -92,8 +92,8 @@ A documentação visual e técnica do projeto PlayDex encontra-se no arquivo PDF
 
 ## 👥 Equipe de Desenvolvimento
 
-- **Ana Julia Nicolack**
-- **Yasmin da Rocha Lopes**
+- **[Ana Julia Nicolack](https://github.com/anajulianicolack-hub)**
+- **[Yasmin da Rocha Lopes](https://github.com/yaslopes07)**
 
 ---
 🎮 **PlayDex — Sua coleção. Seus jogos. Sua história.**
