@@ -64,7 +64,7 @@ Com o Android Studio aberto, acesse:
 Na janela **Clone Repository**, selecione **Git** em *Version control*.
 No campo **URL**, cole o endereço do repositório:
 ```text
-[https://github.com/yaslopes07/playdex2.git](https://github.com/yaslopes07/playdex2.git)
+https://github.com/anajulianicolack-hub/playdex4.git
 ```
 No campo **Directory**, selecione a pasta onde o projeto será salvo.
 Em seguida, clique em **Clone**.
